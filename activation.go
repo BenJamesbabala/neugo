@@ -1,4 +1,4 @@
-package ne
+package neugo
 
 import "math"
 
@@ -18,9 +18,18 @@ func Step() ActivationFunc {
 }
 
 // Sigmoid function is a S-shaped curve that returns 0 or 1
-// as activation signal, given a response rate.
-func Sigmoid(resp float64) ActivationFunc {
+// as activation signal.
+func Sigmoid() ActivationFunc {
 	return func(x float64) float64 {
-		return 1.0 / (1.0 + math.Exp(-x/resp))
+		return 1.0 / (1.0 + math.Exp(-x))
+	}
+}
+
+// Tanh function is a S-shaped curve that returns -1 or 1
+// as activation signal.
+func Tanh() ActivationFunc {
+	return func(x float64) float64 {
+		return (1.0 - math.Exp(-2*x)) /
+			(1.0 + math.Exp(-2*x))
 	}
 }
