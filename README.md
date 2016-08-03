@@ -1,2 +1,2 @@
-# neugo
+# NEUGO
 Neural Networks in Go
