@@ -1,6 +1,10 @@
 package neugo
 
-import "log"
+import "errors"
+
+var (
+	ErrInputs = errors.New("invalid inputs")
+)
 
 const (
 	BIAS = -1.0 // bias for activation
@@ -38,11 +42,11 @@ func (f *FeedForward) NumWeights() int {
 
 // Update the neural network and return output
 // given a set of inputs.
-func (f *FeedForward) Update(inputs []float64) []float64 {
+func (f *FeedForward) Update(inputs []float64) ([]float64, error) {
 	if len(inputs) != f.conf.NumInputs {
-		log.Fatal("Invalid inputs")
+		return nil, ErrInputs
 	}
-	return f.update(inputs, 0)
+	return f.update(inputs, 0), nil
 }
 
 // recursive neural network update helper function
