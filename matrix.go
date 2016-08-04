@@ -87,7 +87,7 @@ func NewExp(numRows, numColumns int, lambda float64) (*Matrix, error) {
 		r: numRows,
 		c: numColumns,
 		data: func() []float64 {
-			len := numRows, numColumns
+			len := numRows * numColumns
 			dat := make([]float64, len)
 			for i, _ := range dat {
 				dat[i] = rand.ExpFloat64() / lambda
@@ -103,7 +103,7 @@ func NewNorm(numRows, numColumns int, m, s float64) (*Matrix, error) {
 	if numRows < 0 || numColumns < 0 {
 		return nil, ErrDimension
 	}
-	return &MatrixReal{
+	return &Matrix{
 		r: numRows,
 		c: numColumns,
 		data: func() []float64 {
@@ -118,22 +118,22 @@ func NewNorm(numRows, numColumns int, m, s float64) (*Matrix, error) {
 }
 
 // Get number of rows.
-func (m *MatrixReal) NumRow() int {
+func (m *Matrix) NumRow() int {
 	return m.r
 }
 
 // Get number of columns.
-func (m *MatrixReal) NumColumn() int {
+func (m *Matrix) NumColumn() int {
 	return m.c
 }
 
 // Get matrix data.
-func (m *MatrixReal) Data() []float64 {
+func (m *Matrix) Data() []float64 {
 	return m.data
 }
 
 // Get element at (x, y); return an error if out of range.
-func (m *MatrixReal) Get(x, y int) (float64, error) {
+func (m *Matrix) Get(x, y int) (float64, error) {
 	if !(0 <= x && x < m.r) || !(0 <= y && y < m.c) {
 		return 0.0, ErrCoordinate
 	}
@@ -142,7 +142,7 @@ func (m *MatrixReal) Get(x, y int) (float64, error) {
 }
 
 // Get row number x from the matrix in a float64 slice.
-func (m *MatrixReal) GetRow(x int) ([]float64, error) {
+func (m *Matrix) GetRow(x int) ([]float64, error) {
 	if !(0 <= x && x < m.r) {
 		return nil, ErrCoordinate
 	}
@@ -154,7 +154,7 @@ func (m *MatrixReal) GetRow(x int) ([]float64, error) {
 }
 
 // Get column number x from the matrix in a float64 slice.
-func (m *MatrixReal) GetCol(x int) ([]float64, error) {
+func (m *Matrix) GetCol(x int) ([]float64, error) {
 	if !(0 <= x && x < m.r) {
 		return nil, ErrCoordinate
 	}
@@ -166,7 +166,7 @@ func (m *MatrixReal) GetCol(x int) ([]float64, error) {
 }
 
 // Set element at (x, y) with a value; return an error if out of range.
-func (m *MatrixReal) Set(v float64, x, y int) error {
+func (m *Matrix) Set(v float64, x, y int) error {
 	if !(0 <= x && x < m.r) || !(0 <= y && y < m.c) {
 		return ErrCoordinate
 	}
@@ -175,19 +175,19 @@ func (m *MatrixReal) Set(v float64, x, y int) error {
 }
 
 // Transposition operation
-func (m *MatrixReal) T() {
+func (m *Matrix) T() {
 
 }
 
 // Scalar multiplication operation.
-func (m *MatrixReal) Scalar(val float64) {
+func (m *Matrix) Scalar(val float64) {
 	for i, _ := range m.data {
 		m.data[i] *= val
 	}
 }
 
 // Matrix addition operation.
-func (m *MatrixReal) Add(m1 Matrix) error {
+func (m *Matrix) Add(m1 Matrix) error {
 	if m.r != m1.r || m.c != m1.c {
 		return ErrDimension
 	}
@@ -198,12 +198,12 @@ func (m *MatrixReal) Add(m1 Matrix) error {
 }
 
 // Matrix multiplication operation.
-func (m *MatrixReal) Mult(m1 Matrix) {
+func (m *Matrix) Mult(m1 Matrix) {
 
 }
 
 // Print matrix in the rows and columns form.
-func (m *MatrixReal) Print() {
+func (m *Matrix) Print() {
 	for i := 0; i < m.r; i++ {
 		fmt.Printf("[ ")
 		for j := 0; j < m.c; j++ {

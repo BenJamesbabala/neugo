@@ -1,4 +1,4 @@
-package ne
+package neugo
 
 import (
 	"fmt"
@@ -28,10 +28,8 @@ func TestNeuralNet(t *testing.T) {
 		NumOutputs: 2,
 		NumLayers:  3,
 		NumNeurons: 4,
-		Activation: Sigmoid(1.0),
 	}
-	nn := NewNeuralNet(conf)
-	nn.Build(NewDNA(66))
+	nn := NewFeedForward(conf)
 
 	inputs := make([]float64, conf.NumInputs)
 	for i, _ := range inputs {

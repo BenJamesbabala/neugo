@@ -1,4 +1,4 @@
-package ne
+package neugo
 
 type Config struct {
 	NumInputs  int            // number of inputs

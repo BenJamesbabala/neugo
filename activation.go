@@ -6,14 +6,14 @@ import "math"
 // and returns 0 or 1 as activation signal.
 type ActivationFunc func(float64) float64
 
-// Step function returns 1 if input is larger than 0.5,
+// Step function returns 1 if input is positive,
 // and returns 0 otherwise.
 func Step() ActivationFunc {
 	return func(x float64) float64 {
-		if x > 0.5 {
-			return 1.0
+		if x < 0 {
+			return 0.0
 		}
-		return 0.0
+		return 1.0
 	}
 }
 
@@ -29,7 +29,6 @@ func Sigmoid() ActivationFunc {
 // as activation signal.
 func Tanh() ActivationFunc {
 	return func(x float64) float64 {
-		return (1.0 - math.Exp(-2*x)) /
-			(1.0 + math.Exp(-2*x))
+		return 2/(1.0+math.Exp(-2*x)) - 1
 	}
 }
