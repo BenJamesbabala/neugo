@@ -1,10 +1,9 @@
 package neugo
 
 type Config struct {
-	NumInputs  int            // number of inputs
-	NumOutputs int            // number of outputs
-	NumLayers  int            // number of hidden layers
-	NumNeurons int            // number of hidden neurons in a layer
+	NumInput   int            // number of inputs
+	NumOutput  int            // number of outputs
+	NumHidden  int            // number of hidden neurons in a layer
 	Activation ActivationFunc // activation function
 }
 
@@ -14,23 +13,18 @@ func NewConfig() *Config {
 }
 
 // Set number of inputs.
-func (c *Config) SetNumInputs(n int) {
-	c.NumInputs = n
+func (c *Config) SetNumInput(n int) {
+	c.NumInput = n
 }
 
 // Set number of outputs.
-func (c *Config) SetNumOutputs(n int) {
-	c.NumOutputs = n
-}
-
-// Set number of layers.
-func (c *Config) SetNumLayers(n int) {
-	c.NumLayers = n
+func (c *Config) SetNumOutput(n int) {
+	c.NumOutput = n
 }
 
 // Set number of neurons in hidden layers.
-func (c *Config) SetNumNeurons(n int) {
-	c.NumNeurons = n
+func (c *Config) SetNumHidden(n int) {
+	c.NumHidden = n
 }
 
 // Set activation function.

@@ -1,4 +1,5 @@
 package neugo
 
-type RecurrentNeuralNet struct {
+// Recurrent Neural Network
+type RNN struct {
 }
