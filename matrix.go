@@ -174,32 +174,67 @@ func (m *Matrix) Set(v float64, x, y int) error {
 	return nil
 }
 
-// Transposition operation
-func (m *Matrix) T() {
-
+// Copy other matrix.
+func (m *Matrix) Copy(m1 *Matrix) {
+	m.r = m1.r
+	m.c = m1.c
+	copy(m.data, m1.data)
 }
 
 // Scalar multiplication operation.
-func (m *Matrix) Scalar(val float64) {
-	for i, _ := range m.data {
-		m.data[i] *= val
+func (m *Matrix) Scalar(val float64) (*Matrix, error) {
+	result, err := NewZeros(m.r, m.c)
+	if err != nil {
+		return nil, err
 	}
+	for i, d := range m.data {
+		result.data[i] = d * val
+	}
+	return result, nil
 }
 
 // Matrix addition operation.
-func (m *Matrix) Add(m1 Matrix) error {
+func (m *Matrix) Add(m1 *Matrix) (*Matrix, error) {
 	if m.r != m1.r || m.c != m1.c {
-		return ErrDimension
+		return nil, ErrDimension
 	}
-	for i, d := range m1.data {
-		m.data[i] += d
+	result, err := NewZeros(m.r, m.c)
+	if err != nil {
+		return nil, err
 	}
-	return nil
+	for i, _ := range m1.data {
+		result.data[i] = m.data[i] + m1.data[i]
+	}
+	return result, nil
 }
 
 // Matrix multiplication operation.
-func (m *Matrix) Mult(m1 Matrix) {
-
+func (m *Matrix) Mult(m1 *Matrix) (*Matrix, error) {
+	if m.c != m1.r {
+		return nil, ErrDimension
+	}
+	result, err := NewZeros(m.r, m1.c)
+	if err != nil {
+		return nil, err
+	}
+	for i := 0; i < result.r; i++ {
+		for j := 0; j < result.c; j++ {
+			val := 0.0
+			for k := 0; k < m.c; k++ {
+				a, err := m.Get(i, k)
+				if err != nil {
+					return nil, err
+				}
+				b, err := m1.Get(k, j)
+				if err != nil {
+					return nil, err
+				}
+				val += (a + b)
+			}
+			result.Set(val, i, j)
+		}
+	}
+	return result, nil
 }
 
 // Print matrix in the rows and columns form.

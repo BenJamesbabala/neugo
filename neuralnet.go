@@ -9,7 +9,7 @@ func NewNeuralNet(conf *Config) *NeuralNet {
 	return &NeuralNet{
 		conf: conf,
 		weights: func() []*Matrix {
-			weights := make([]*Matrix)
+			weights := make([]*Matrix, 2)
 
 			// to be implemented
 
