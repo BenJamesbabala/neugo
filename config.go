@@ -4,6 +4,7 @@ type Config struct {
 	NumInput   int            // number of inputs
 	NumOutput  int            // number of outputs
 	NumHidden  int            // number of hidden neurons in a layer
+	NumLayer   int            // number of hidden layers
 	Activation ActivationFunc // activation function
 }
 
@@ -25,6 +26,11 @@ func (c *Config) SetNumOutput(n int) {
 // Set number of neurons in hidden layers.
 func (c *Config) SetNumHidden(n int) {
 	c.NumHidden = n
+}
+
+// Set number of hidden layers.
+func (c *Config) SetNumLayer(n int) {
+	c.NumLayer = n
 }
 
 // Set activation function.
