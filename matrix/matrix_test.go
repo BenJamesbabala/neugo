@@ -1,4 +1,4 @@
-package neugo
+package matrix
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 
 func TestMatrix(t *testing.T) {
 	// zeros
-	m, err := NewZeros(4, 4)
+	m, err := NewZeros(8, 4)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -16,7 +16,7 @@ func TestMatrix(t *testing.T) {
 	m.Print()
 
 	// ones
-	m1, err := NewOnes(4, 4)
+	m1, err := NewOnes(4, 6)
 	if err != nil {
 		log.Fatal(err)
 	}

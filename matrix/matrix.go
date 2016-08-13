@@ -1,4 +1,4 @@
-package neugo
+package matrix
 
 import (
 	"errors"
@@ -20,6 +20,19 @@ var (
 type Matrix struct {
 	r, c int       // number of rows and columns
 	data []float64 // stored matrix data
+}
+
+// Create a new matrix given number of rows, number of columns,
+// and data (slice of float64).
+func New(numRows, numColumns int, data []float64) (*Matrix, error) {
+	if numRows*numColumns != len(data) {
+		return nil, ErrDimension
+	}
+	return &Matrix{
+		r:    numRows,
+		c:    numColumns,
+		data: data,
+	}, nil
 }
 
 // Create a new empty matrix given numbers of rows and columns.
@@ -132,13 +145,24 @@ func (m *Matrix) Data() []float64 {
 	return m.data
 }
 
+// Resize the matrix given a new pair of number of rows
+// and number of columns.
+func (m *Matrix) Resize(r, c int) error {
+	if r*c != len(m.data) {
+		return ErrDimension
+	}
+	// resize
+	m.r, m.c = r, c
+	return nil
+}
+
 // Get element at (x, y); return an error if out of range.
 func (m *Matrix) Get(x, y int) (float64, error) {
 	if !(0 <= x && x < m.r) || !(0 <= y && y < m.c) {
 		return 0.0, ErrCoordinate
 	}
 	// otherwise, get data
-	return m.data[m.r*x+y], nil
+	return m.data[m.c*x+y], nil
 }
 
 // Get row number x from the matrix in a float64 slice.
@@ -148,7 +172,7 @@ func (m *Matrix) GetRow(x int) ([]float64, error) {
 	}
 	row := make([]float64, m.c)
 	for i, _ := range row {
-		row[i] = m.data[m.r*x+i]
+		row[i] = m.data[m.c*x+i]
 	}
 	return row, nil
 }
@@ -160,7 +184,7 @@ func (m *Matrix) GetCol(x int) ([]float64, error) {
 	}
 	col := make([]float64, m.r)
 	for i, _ := range col {
-		col[i] = m.data[x+i*m.r]
+		col[i] = m.data[x+i*m.c]
 	}
 	return col, nil
 }
@@ -170,7 +194,7 @@ func (m *Matrix) Set(v float64, x, y int) error {
 	if !(0 <= x && x < m.r) || !(0 <= y && y < m.c) {
 		return ErrCoordinate
 	}
-	m.data[m.r*x+y] = v
+	m.data[m.c*x+y] = v
 	return nil
 }
 
@@ -249,18 +273,12 @@ func (m *Matrix) Mult(m1 *Matrix) (*Matrix, error) {
 	return result, nil
 }
 
-// Multiplication with a vector (slice of float64). This function
-// is meant to be used for neural network iteration.
-func (m *Matrix) MultVec() []float64 {
-
-}
-
 // Print matrix in the rows and columns form.
 func (m *Matrix) Print() {
 	for i := 0; i < m.r; i++ {
 		fmt.Printf("[ ")
 		for j := 0; j < m.c; j++ {
-			fmt.Printf("%8.3f ", m.data[m.r*i+j])
+			fmt.Printf("%8.3f ", m.data[m.c*i+j])
 		}
 		fmt.Printf("]\n")
 	}
