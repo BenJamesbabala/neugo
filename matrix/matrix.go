@@ -193,6 +193,18 @@ func (m *Matrix) Scalar(val float64) (*Matrix, error) {
 	return result, nil
 }
 
+// Function operation.
+func (m *Matrix) Func(fn func(float64) float64) (*Matrix, error) {
+	result, err := NewZeros(m.r, m.c)
+	if err != nil {
+		return nil, err
+	}
+	for i, d := range m.data {
+		result.data[i] = fn(d)
+	}
+	return result, nil
+}
+
 // Matrix addition operation.
 func (m *Matrix) Add(m1 *Matrix) (*Matrix, error) {
 	if m.r != m1.r || m.c != m1.c {
@@ -219,7 +231,7 @@ func (m *Matrix) Mult(m1 *Matrix) (*Matrix, error) {
 	}
 	for i := 0; i < result.r; i++ {
 		for j := 0; j < result.c; j++ {
-			val := 0.0
+			sum := 0.0
 			for k := 0; k < m.c; k++ {
 				a, err := m.Get(i, k)
 				if err != nil {
@@ -229,12 +241,18 @@ func (m *Matrix) Mult(m1 *Matrix) (*Matrix, error) {
 				if err != nil {
 					return nil, err
 				}
-				val += (a + b)
+				sum += (a * b)
 			}
-			result.Set(val, i, j)
+			result.Set(sum, i, j)
 		}
 	}
 	return result, nil
+}
+
+// Multiplication with a vector (slice of float64). This function
+// is meant to be used for neural network iteration.
+func (m *Matrix) MultVec() []float64 {
+
 }
 
 // Print matrix in the rows and columns form.

@@ -8,7 +8,7 @@ import (
 
 func TestMatrix(t *testing.T) {
 	// zeros
-	m, err := NewZeros(3, 4)
+	m, err := NewZeros(4, 4)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -16,7 +16,7 @@ func TestMatrix(t *testing.T) {
 	m.Print()
 
 	// ones
-	m1, err := NewOnes(3, 4)
+	m1, err := NewOnes(4, 4)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -24,7 +24,7 @@ func TestMatrix(t *testing.T) {
 	m1.Print()
 
 	// exp
-	m2, err := NewExp(2, 2, 0.5)
+	m2, err := NewExp(3, 3, 0.5)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -32,7 +32,7 @@ func TestMatrix(t *testing.T) {
 	m2.Print()
 
 	// Norm
-	m3, err := NewNorm(2, 2, 0.0, 6.0)
+	m3, err := NewNorm(3, 3, 0.0, 6.0)
 	if err != nil {
 		log.Fatal(err)
 	}
