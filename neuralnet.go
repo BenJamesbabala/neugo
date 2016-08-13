@@ -6,6 +6,10 @@ import (
 	"github.com/jinseokYeom/neugo/matrix"
 )
 
+const (
+	BIAS = -1.0
+)
+
 var (
 	// wrong number of inputs
 	ErrInputLen = errors.New("invalid input length")
@@ -43,8 +47,23 @@ func (n *NeuralNet) Weights() []*matrix.Matrix {
 }
 
 // Activate the neural network.
-func (n *NeuralNet) Activate(inputs []float64) []float64 {
+func (n *NeuralNet) Activate(inputs []float64) ([]float64, error) {
 	if len(inputs) != n.conf.NumInput {
 		return nil, ErrInputLen
 	}
+	for _, w := range n.weights {
+		inputs = append(inputs, BIAS)
+		im := matrix.New(1, len(inputs), inputs)
+		outputs, err := im.Mult(w)
+		if err != nil {
+			return nil, err
+		}
+		// apply activation function
+		signals, err := outputs.Func(n.conf.Activation)
+		if err != nil {
+			return nil, err
+		}
+		inputs = outputs
+	}
+	return outputs, nil
 }
