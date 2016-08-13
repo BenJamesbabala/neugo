@@ -9,7 +9,7 @@ run.
 ## Algorithms
 Following are available algorithms currently. More will be added with further
 updates.
-* Feed forward neural network
+* Feedforward neural network
 
 ## Planned Algorithms
 These are algorithms that are not implemented yet, but are planned to be added
