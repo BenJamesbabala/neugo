@@ -20,30 +20,53 @@ type NeuralNet struct {
 	weights []*matrix.Matrix // list of weights
 }
 
-func NewNeuralNet(conf *Config) *NeuralNet {
-	return &NeuralNet{
-		conf: conf,
-		weights: func() []*matrix.Matrix {
-			weights := make([]*matrix.Matrix, 2)
-			// input layer -> hidden layer
-			weights[0] = matrix.NewNorm(conf.NumInput,
-				conf.NumHidden, 0.0, 6.0)
-			// hidden layer[t] -> hidden layer[t+1]
-			for i := 1; i < conf.NumLayer-1; i++ {
-				weights[i] = matrix.NewNorm(conf.NumHidden,
-					conf.NumHidden, 0.0, 6.0)
-			}
-			// hidden layer -> output layer
-			weights[conf.NumLayer-1] = matrix.NewNorm(conf.NumHidden,
-				conf.NumOutput, 0.0, 6.0)
-			return weights
-		}(),
+func NewNeuralNet(conf *Config) (*NeuralNet, error) {
+	// generate weights of neural net
+	weights := make([]*matrix.Matrix, conf.NumLayer+1)
+	// input layer -> hidden layer
+	il, err := matrix.NewNorm(
+		conf.NumInput+1, // number of inputs + 1 (BIAS)
+		conf.NumHidden,  // number of hidden neurons
+		0.0,             // mean = 0
+		6.0,             // std. dev = 6
+	)
+	if err != nil {
+		return nil, err
 	}
+	weights[0] = il
+	// hidden layer[t] -> hidden layer[t+1]
+	for i := 1; i < conf.NumLayer; i++ {
+		hl, err := matrix.NewNorm(
+			conf.NumHidden+1, // number of hidden neurons + 1 (BIAS)
+			conf.NumHidden,   // number of hidden neurons
+			0.0,              // mean = 0
+			6.0,              // std. dev = 6
+		)
+		if err != nil {
+			return nil, err
+		}
+		weights[i] = hl
+	}
+	// hidden layer -> output layer
+	ol, err := matrix.NewNorm(
+		conf.NumHidden+1, // number of hidden nuerons + 1 (BIAS)
+		conf.NumOutput,   // number of outputs
+		0.0,              // mean = 0
+		6.0,              // std. dev = 6
+	)
+	if err != nil {
+		return nil, err
+	}
+	weights[conf.NumLayer] = ol
+	return &NeuralNet{
+		conf:    conf,
+		weights: weights,
+	}, nil
 }
 
 // Get the neural network's weights.
 func (n *NeuralNet) Weights() []*matrix.Matrix {
-	return weights
+	return n.weights
 }
 
 // Activate the neural network.
@@ -53,17 +76,11 @@ func (n *NeuralNet) Activate(inputs []float64) ([]float64, error) {
 	}
 	for _, w := range n.weights {
 		inputs = append(inputs, BIAS)
-		im := matrix.New(1, len(inputs), inputs)
-		outputs, err := im.Mult(w)
-		if err != nil {
-			return nil, err
-		}
+		im, _ := matrix.New(1, len(inputs), inputs)
+		outputs, _ := im.Mult(w)
 		// apply activation function
-		signals, err := outputs.Func(n.conf.Activation)
-		if err != nil {
-			return nil, err
-		}
-		inputs = outputs
+		outputs, _ = outputs.Func(n.conf.Activation)
+		inputs = outputs.Data()
 	}
-	return outputs, nil
+	return inputs, nil
 }
