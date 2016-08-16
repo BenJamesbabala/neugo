@@ -10,6 +10,8 @@ import (
 var (
 	// wrong number of inputs
 	ErrInputLen = errors.New("invalid input length")
+	// wrong number of weights
+	ErrWeightLen = errors.New("invalid weigth length")
 )
 
 type NeuralNet struct {
@@ -80,7 +82,45 @@ func (n *NeuralNet) Memory() []*matrix.Matrix {
 	return n.memory
 }
 
-// Activate the neural network and feedforward.
+// Build the neural network given a list of weights; return an
+// error if wrong number of weights are provided.
+func (n *NeuralNet) Build(weights []float64) error {
+	numWeights := n.NumWeights()
+	if len(weights) != n.NumWeights() {
+		return ErrWeightLen
+	}
+	// input layer -> hidden layer
+	ih := (n.conf.NumInput + 1) * n.conf.NumHidden
+	ihWeights := weights[:ih]
+	n.weights[0] = matrix.New(
+		n.conf.NumInput+1,
+		n.conf.NumHidden,
+		ihWeights,
+	)
+	// hidden layer -> hidden layer
+	prev := ih
+	for i := 1; i < n.conf.NumLayer; i++ {
+		next := prev + (n.conf.NumHidden+1)*n.conf.NumHidden
+		hhWeights := weights[prev:next]
+		n.weights[i] = matrix.New(
+			n.conf.NumHidden+1,
+			n.conf.NumHidden,
+			hhWeights,
+		)
+		prev = next
+	}
+	// hidden layer -> output layer
+	hoWeights := weights[prev:]
+	n.weights[len(n.weights)-1] = matrix.New(
+		n.conf.NumHidden+1,
+		n.conf.NumOutput,
+		hoWeights,
+	)
+	return nil
+}
+
+// Activate the neural network and feedforward. Return an error
+// if wrong number of inputs are provided.
 func (n *NeuralNet) Feedforward(inputs []float64) ([]float64, error) {
 	if len(inputs) != n.conf.NumInput {
 		return nil, ErrInputLen
