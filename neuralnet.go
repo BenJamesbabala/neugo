@@ -2,6 +2,7 @@ package neugo
 
 import (
 	"errors"
+	"math"
 
 	"github.com/jinseokYeom/neugo/matrix"
 )
@@ -18,6 +19,7 @@ var (
 type NeuralNet struct {
 	conf    *Config          // configuration
 	weights []*matrix.Matrix // list of weights
+	memory  []*matrix.Matrix // memory of activations
 }
 
 func NewNeuralNet(conf *Config) (*NeuralNet, error) {
@@ -61,6 +63,7 @@ func NewNeuralNet(conf *Config) (*NeuralNet, error) {
 	return &NeuralNet{
 		conf:    conf,
 		weights: weights,
+		memory:  make([]*matrix.Matrix, conf.NumLayer+1),
 	}, nil
 }
 
@@ -69,18 +72,30 @@ func (n *NeuralNet) Weights() []*matrix.Matrix {
 	return n.weights
 }
 
-// Activate the neural network.
-func (n *NeuralNet) Activate(inputs []float64) ([]float64, error) {
+// Activate the neural network and feedforward.
+func (n *NeuralNet) Feedforward(inputs []float64) ([]float64, error) {
 	if len(inputs) != n.conf.NumInput {
 		return nil, ErrInputLen
 	}
-	for _, w := range n.weights {
+	for i, w := range n.weights {
 		inputs = append(inputs, BIAS)
 		im, _ := matrix.New(1, len(inputs), inputs)
 		outputs, _ := im.Mult(w)
 		// apply activation function
 		outputs, _ = outputs.Func(n.conf.Activation)
+		// store activation output
+		n.memory[i] = outputs
 		inputs = outputs.Data()
 	}
 	return inputs, nil
+}
+
+// Backpropagation for training, given a prediction and an actual answer.
+func (n *NeuralNet) Backpropagate(pred, actual []float64) {
+	err := make([]float64, len(pred))
+	for i, _ := range err {
+		// cost function
+		err[i] = math.Pow(pred[i]-actual[i], 2) / 2.0
+	}
+
 }

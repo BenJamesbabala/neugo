@@ -22,11 +22,12 @@ func TestNeuralNet(t *testing.T) {
 		fmt.Printf("LAYER %d\n", i)
 		w.Print()
 	}
-	outputs, err := nn.Activate([]float64{0.1, 0.4, 0.63})
+	outputs, err := nn.Feedforward([]float64{0.1, 0.4, 0.63})
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Printf("outputs: %f\n", outputs)
+	fmt.Printf("memory: %f\n", nn.memory)
 
 	// power test
 	for i := 1; i < 100; i++ {
@@ -40,7 +41,7 @@ func TestNeuralNet(t *testing.T) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		outputs, err := nn.Activate([]float64{0.1, 0.4, 0.63})
+		outputs, err := nn.Feedforward([]float64{0.1, 0.4, 0.63})
 		if err != nil {
 			log.Fatal(err)
 		}
