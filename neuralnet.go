@@ -7,10 +7,6 @@ import (
 	"github.com/jinseokYeom/neugo/matrix"
 )
 
-const (
-	BIAS = -1.0
-)
-
 var (
 	// wrong number of inputs
 	ErrInputLen = errors.New("invalid input length")
@@ -27,10 +23,10 @@ func NewNeuralNet(conf *Config) (*NeuralNet, error) {
 	weights := make([]*matrix.Matrix, conf.NumLayer+1)
 	// input layer -> hidden layer
 	il, err := matrix.NewNorm(
-		conf.NumInput+1, // number of inputs + 1 (BIAS)
-		conf.NumHidden,  // number of hidden neurons
-		0.0,             // mean = 0
-		6.0,             // std. dev = 6
+		conf.NumInput+1,   // number of inputs + 1 (BIAS)
+		conf.NumHidden,    // number of hidden neurons
+		conf.WeightMean,   // mean
+		conf.WeightStdDev, // std. dev
 	)
 	if err != nil {
 		return nil, err
@@ -39,10 +35,10 @@ func NewNeuralNet(conf *Config) (*NeuralNet, error) {
 	// hidden layer[t] -> hidden layer[t+1]
 	for i := 1; i < conf.NumLayer; i++ {
 		hl, err := matrix.NewNorm(
-			conf.NumHidden+1, // number of hidden neurons + 1 (BIAS)
-			conf.NumHidden,   // number of hidden neurons
-			0.0,              // mean = 0
-			6.0,              // std. dev = 6
+			conf.NumHidden+1,  // number of hidden neurons + 1 (BIAS)
+			conf.NumHidden,    // number of hidden neurons
+			conf.WeightMean,   // mean
+			conf.WeightStdDev, // std. dev
 		)
 		if err != nil {
 			return nil, err
@@ -51,10 +47,10 @@ func NewNeuralNet(conf *Config) (*NeuralNet, error) {
 	}
 	// hidden layer -> output layer
 	ol, err := matrix.NewNorm(
-		conf.NumHidden+1, // number of hidden nuerons + 1 (BIAS)
-		conf.NumOutput,   // number of outputs
-		0.0,              // mean = 0
-		6.0,              // std. dev = 6
+		conf.NumHidden+1,  // number of hidden nuerons + 1 (BIAS)
+		conf.NumOutput,    // number of outputs
+		conf.WeightMean,   // mean
+		conf.WeightStdDev, // std. dev
 	)
 	if err != nil {
 		return nil, err
@@ -65,6 +61,13 @@ func NewNeuralNet(conf *Config) (*NeuralNet, error) {
 		weights: weights,
 		memory:  make([]*matrix.Matrix, conf.NumLayer+1),
 	}, nil
+}
+
+// Get the total number of neural network's weights.
+func (n *NeuralNet) NumWeights() int {
+	return (n.conf.NumInput+1)*n.conf.NumHidden +
+		(n.conf.NumHidden+1)*n.conf.NumHidden*n.conf.NumLayer +
+		(n.conf.NumHidden+1)*n.conf.NumOutput
 }
 
 // Get the neural network's weights.
@@ -78,7 +81,7 @@ func (n *NeuralNet) Feedforward(inputs []float64) ([]float64, error) {
 		return nil, ErrInputLen
 	}
 	for i, w := range n.weights {
-		inputs = append(inputs, BIAS)
+		inputs = append(inputs, n.conf.Bias)
 		im, _ := matrix.New(1, len(inputs), inputs)
 		outputs, _ := im.Mult(w)
 		// apply activation function

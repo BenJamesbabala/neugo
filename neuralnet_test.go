@@ -8,11 +8,14 @@ import (
 
 func TestNeuralNet(t *testing.T) {
 	nn, err := NewNeuralNet(&Config{
-		NumInput:   3,
-		NumOutput:  2,
-		NumHidden:  4,
-		NumLayer:   3,
-		Activation: Sigmoid(),
+		NumInput:     3,
+		NumOutput:    2,
+		NumHidden:    4,
+		NumLayer:     3,
+		Bias:         -1.0,
+		WeightMean:   0.0,
+		WeightStdDev: 6.0,
+		Activation:   Sigmoid(),
 	})
 	if err != nil {
 		log.Fatal(err)
@@ -27,16 +30,25 @@ func TestNeuralNet(t *testing.T) {
 		log.Fatal(err)
 	}
 	fmt.Printf("outputs: %f\n", outputs)
-	fmt.Printf("memory: %f\n", nn.memory)
+
+	// memory
+	fmt.Printf("memory:\n")
+	for i, m := range nn.memory {
+		fmt.Printf("Layer %d\n", i)
+		m.Print()
+	}
 
 	// power test
 	for i := 1; i < 100; i++ {
 		nn, err = NewNeuralNet(&Config{
-			NumInput:   3,
-			NumOutput:  2,
-			NumHidden:  i,
-			NumLayer:   i,
-			Activation: Sigmoid(),
+			NumInput:     3,
+			NumOutput:    2,
+			NumHidden:    i,
+			NumLayer:     i,
+			Bias:         -1.0,
+			WeightMean:   0.0,
+			WeightStdDev: 6.0,
+			Activation:   Sigmoid(),
 		})
 		if err != nil {
 			log.Fatal(err)

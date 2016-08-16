@@ -1,11 +1,14 @@
 package neugo
 
 type Config struct {
-	NumInput   int            // number of inputs
-	NumOutput  int            // number of outputs
-	NumHidden  int            // number of hidden neurons in a layer
-	NumLayer   int            // number of hidden layers
-	Activation ActivationFunc // activation function
+	NumInput     int            // number of inputs
+	NumOutput    int            // number of outputs
+	NumHidden    int            // number of hidden neurons in a layer
+	NumLayer     int            // number of hidden layers
+	Bias         float64        // bias for neural net
+	WeightMean   float64        // mean of weights
+	WeightStdDev float64        // standard deviation of weights
+	Activation   ActivationFunc // activation function
 }
 
 // Create a new configuration set to null.
@@ -31,6 +34,21 @@ func (c *Config) SetNumHidden(n int) {
 // Set number of hidden layers.
 func (c *Config) SetNumLayer(n int) {
 	c.NumLayer = n
+}
+
+// Set bias for neural net.
+func (c *Config) SetBias(n float64) {
+	c.Bias = n
+}
+
+// Set mean for each weight of neural net.
+func (c *Config) SetWeightMean(n float64) {
+	c.WeightMean = n
+}
+
+// Set standard deviation for each weight of neural net.
+func (c *Config) SetWeightStdDev(n float64) {
+	c.WeightStdDev = n
 }
 
 // Set activation function.
