@@ -75,6 +75,11 @@ func (n *NeuralNet) Weights() []*matrix.Matrix {
 	return n.weights
 }
 
+// Get the neural network's current memory.
+func (n *NeuralNet) Memory() []*matrix.Matrix {
+	return n.memory
+}
+
 // Activate the neural network and feedforward.
 func (n *NeuralNet) Feedforward(inputs []float64) ([]float64, error) {
 	if len(inputs) != n.conf.NumInput {
@@ -95,10 +100,13 @@ func (n *NeuralNet) Feedforward(inputs []float64) ([]float64, error) {
 
 // Backpropagation for training, given a prediction and an actual answer.
 func (n *NeuralNet) Backpropagate(pred, actual []float64) {
-	err := make([]float64, len(pred))
+	totalErr := 0.0
+	errVec := make([]float64, len(pred))
 	for i, _ := range err {
-		// cost function
-		err[i] = math.Pow(pred[i]-actual[i], 2) / 2.0
+		// squared error function
+		err := math.Pow(pred[i]-actual[i], 2) / 2.0
+		totalErr += err
+		errVec[i] = err
 	}
 
 }
