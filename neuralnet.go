@@ -85,37 +85,48 @@ func (n *NeuralNet) Memory() []*matrix.Matrix {
 // Build the neural network given a list of weights; return an
 // error if wrong number of weights are provided.
 func (n *NeuralNet) Build(weights []float64) error {
-	numWeights := n.NumWeights()
 	if len(weights) != n.NumWeights() {
 		return ErrWeightLen
 	}
 	// input layer -> hidden layer
 	ih := (n.conf.NumInput + 1) * n.conf.NumHidden
 	ihWeights := weights[:ih]
-	n.weights[0] = matrix.New(
+	ihMat, err := matrix.New(
 		n.conf.NumInput+1,
 		n.conf.NumHidden,
 		ihWeights,
 	)
+	if err != nil {
+		return err
+	}
+	n.weights[0] = ihMat
 	// hidden layer -> hidden layer
 	prev := ih
 	for i := 1; i < n.conf.NumLayer; i++ {
 		next := prev + (n.conf.NumHidden+1)*n.conf.NumHidden
 		hhWeights := weights[prev:next]
-		n.weights[i] = matrix.New(
+		hhMat, err := matrix.New(
 			n.conf.NumHidden+1,
 			n.conf.NumHidden,
 			hhWeights,
 		)
+		if err != nil {
+			return err
+		}
+		n.weights[i] = hhMat
 		prev = next
 	}
 	// hidden layer -> output layer
 	hoWeights := weights[prev:]
-	n.weights[len(n.weights)-1] = matrix.New(
+	hoMat, err := matrix.New(
 		n.conf.NumHidden+1,
 		n.conf.NumOutput,
 		hoWeights,
 	)
+	if err != nil {
+		return err
+	}
+	n.weights[len(n.weights)-1] = hoMat
 	return nil
 }
 
@@ -142,7 +153,7 @@ func (n *NeuralNet) Feedforward(inputs []float64) ([]float64, error) {
 func (n *NeuralNet) Backpropagate(pred, actual []float64) {
 	totalErr := 0.0
 	errVec := make([]float64, len(pred))
-	for i, _ := range err {
+	for i, _ := range errVec {
 		// squared error function
 		err := math.Pow(pred[i]-actual[i], 2) / 2.0
 		totalErr += err

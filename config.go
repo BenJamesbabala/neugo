@@ -6,8 +6,8 @@ type Config struct {
 	NumHidden    int            // number of hidden neurons in a layer
 	NumLayer     int            // number of hidden layers
 	Bias         float64        // bias for neural net
-	WeightMean   float64        // mean of weights
-	WeightStdDev float64        // standard deviation of weights
+	WeightMean   float64        // weight mean
+	WeightStdDev float64        // weight standard deviation
 	Activation   ActivationFunc // activation function
 }
 
@@ -41,12 +41,12 @@ func (c *Config) SetBias(n float64) {
 	c.Bias = n
 }
 
-// Set mean for each weight of neural net.
+// Set weight mean for neural net.
 func (c *Config) SetWeightMean(n float64) {
 	c.WeightMean = n
 }
 
-// Set standard deviation for each weight of neural net.
+// Set weight standard deviation for neural net.
 func (c *Config) SetWeightStdDev(n float64) {
 	c.WeightStdDev = n
 }

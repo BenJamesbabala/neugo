@@ -19,10 +19,13 @@ func XORTest() Environment {
 		// 0 xor 0
 		output, _ := nn.Feedforward([]float64{0.0, 0.0})
 		totalErr += math.Pow(output[0]-0.0, 2.0)
+		// 0 xor 1
 		output, _ = nn.Feedforward([]float64{0.0, 1.0})
 		totalErr += math.Pow(output[0]-1.0, 2.0)
+		// 1 xor 0
 		output, _ = nn.Feedforward([]float64{1.0, 0.0})
 		totalErr += math.Pow(output[0]-1.0, 2.0)
+		// 1 xor 1
 		output, _ = nn.Feedforward([]float64{1.0, 1.0})
 		totalErr += math.Pow(output[0]-0.0, 2.0)
 		return totalErr
