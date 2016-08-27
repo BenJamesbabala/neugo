@@ -160,4 +160,5 @@ func (n *NeuralNet) Backpropagate(pred, actual []float64) {
 		errVec[i] = err
 	}
 
+	// to be implemented
 }
