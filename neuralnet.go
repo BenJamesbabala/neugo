@@ -4,7 +4,7 @@ import (
 	"errors"
 	"math"
 
-	"github.com/jinseokYeom/neugo/matrix"
+	"github.com/jinseokYeom/matrix"
 )
 
 var (
