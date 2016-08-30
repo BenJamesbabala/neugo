@@ -2,9 +2,10 @@ package neugo
 
 import (
 	"errors"
+	"fmt"
 	"math"
 
-	"github.com/jinseokYeom/matrix"
+	"github.com/jinseokYeom/migo"
 )
 
 var (
@@ -15,16 +16,16 @@ var (
 )
 
 type NeuralNet struct {
-	conf    *Config          // configuration
-	weights []*matrix.Matrix // list of weights
-	memory  []*matrix.Matrix // memory of activations
+	conf    *Config        // configuration
+	weights []*migo.Matrix // list of weights
+	memory  []*migo.Matrix // memory of activations
 }
 
 func NewNeuralNet(conf *Config) (*NeuralNet, error) {
 	// generate weights of neural net
-	weights := make([]*matrix.Matrix, conf.NumLayer+1)
+	weights := make([]*migo.Matrix, conf.NumLayer+1)
 	// input layer -> hidden layer
-	il, err := matrix.NewNorm(
+	il, err := migo.NewNorm(
 		conf.NumInput+1,   // number of inputs + 1 (BIAS)
 		conf.NumHidden,    // number of hidden neurons
 		conf.WeightMean,   // mean
@@ -36,7 +37,7 @@ func NewNeuralNet(conf *Config) (*NeuralNet, error) {
 	weights[0] = il
 	// hidden layer[t] -> hidden layer[t+1]
 	for i := 1; i < conf.NumLayer; i++ {
-		hl, err := matrix.NewNorm(
+		hl, err := migo.NewNorm(
 			conf.NumHidden+1,  // number of hidden neurons + 1 (BIAS)
 			conf.NumHidden,    // number of hidden neurons
 			conf.WeightMean,   // mean
@@ -48,7 +49,7 @@ func NewNeuralNet(conf *Config) (*NeuralNet, error) {
 		weights[i] = hl
 	}
 	// hidden layer -> output layer
-	ol, err := matrix.NewNorm(
+	ol, err := migo.NewNorm(
 		conf.NumHidden+1,  // number of hidden nuerons + 1 (BIAS)
 		conf.NumOutput,    // number of outputs
 		conf.WeightMean,   // mean
@@ -61,7 +62,7 @@ func NewNeuralNet(conf *Config) (*NeuralNet, error) {
 	return &NeuralNet{
 		conf:    conf,
 		weights: weights,
-		memory:  make([]*matrix.Matrix, conf.NumLayer+1),
+		memory:  make([]*migo.Matrix, conf.NumLayer+1),
 	}, nil
 }
 
@@ -73,12 +74,12 @@ func (n *NeuralNet) NumWeights() int {
 }
 
 // Get the neural network's weights.
-func (n *NeuralNet) Weights() []*matrix.Matrix {
+func (n *NeuralNet) Weights() []*migo.Matrix {
 	return n.weights
 }
 
 // Get the neural network's current memory.
-func (n *NeuralNet) Memory() []*matrix.Matrix {
+func (n *NeuralNet) Memory() []*migo.Matrix {
 	return n.memory
 }
 
@@ -91,7 +92,7 @@ func (n *NeuralNet) Build(weights []float64) error {
 	// input layer -> hidden layer
 	ih := (n.conf.NumInput + 1) * n.conf.NumHidden
 	ihWeights := weights[:ih]
-	ihMat, err := matrix.New(
+	ihMat, err := migo.New(
 		n.conf.NumInput+1,
 		n.conf.NumHidden,
 		ihWeights,
@@ -105,7 +106,7 @@ func (n *NeuralNet) Build(weights []float64) error {
 	for i := 1; i < n.conf.NumLayer; i++ {
 		next := prev + (n.conf.NumHidden+1)*n.conf.NumHidden
 		hhWeights := weights[prev:next]
-		hhMat, err := matrix.New(
+		hhMat, err := migo.New(
 			n.conf.NumHidden+1,
 			n.conf.NumHidden,
 			hhWeights,
@@ -118,7 +119,7 @@ func (n *NeuralNet) Build(weights []float64) error {
 	}
 	// hidden layer -> output layer
 	hoWeights := weights[prev:]
-	hoMat, err := matrix.New(
+	hoMat, err := migo.New(
 		n.conf.NumHidden+1,
 		n.conf.NumOutput,
 		hoWeights,
@@ -138,12 +139,15 @@ func (n *NeuralNet) Feedforward(inputs []float64) ([]float64, error) {
 	}
 	for i, w := range n.weights {
 		inputs = append(inputs, n.conf.Bias)
-		im, _ := matrix.New(1, len(inputs), inputs)
+		im, _ := migo.New(1, len(inputs), inputs)
 		outputs, _ := im.Mult(w)
 		// apply activation function
-		outputs, _ = outputs.Func(n.conf.Activation)
+		fmt.Printf("OUTPUT NUM ROW: %d\n", outputs.NumRow())
+		fmt.Printf("OUTPUT NUM COL: %d\n", outputs.NumColumn())
+		fmt.Printf("OUTPUT DATA: %f\n", outputs.Data())
+		signal := outputs.Func(n.conf.Activation)
 		// store activation output
-		n.memory[i] = outputs
+		n.memory[i].Copy(signal)
 		inputs = outputs.Data()
 	}
 	return inputs, nil
