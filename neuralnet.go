@@ -3,7 +3,6 @@ package neugo
 import (
 	"errors"
 	"fmt"
-	"math"
 
 	"github.com/wh1t3w01f/migo"
 )
