@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/jinseokYeom/migo"
+	"github.com/wh1t3w01f/migo"
 )
 
 var (
