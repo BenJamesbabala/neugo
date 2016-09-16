@@ -152,17 +152,3 @@ func (n *NeuralNet) Feedforward(inputs []float64) ([]float64, error) {
 	}
 	return inputs, nil
 }
-
-// Backpropagation for training, given a prediction and an actual answer.
-func (n *NeuralNet) Backpropagate(pred, actual []float64) {
-	totalErr := 0.0
-	errVec := make([]float64, len(pred))
-	for i, _ := range errVec {
-		// squared error function
-		err := math.Pow(pred[i]-actual[i], 2) / 2.0
-		totalErr += err
-		errVec[i] = err
-	}
-
-	// to be implemented
-}
