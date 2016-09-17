@@ -2,7 +2,6 @@ package neugo
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/wh1t3w01f/migo"
 )
@@ -17,7 +16,6 @@ var (
 type NeuralNet struct {
 	conf    *Config        // configuration
 	weights []*migo.Matrix // list of weights
-	memory  []*migo.Matrix // memory of activations
 }
 
 func NewNeuralNet(conf *Config) (*NeuralNet, error) {
@@ -61,7 +59,6 @@ func NewNeuralNet(conf *Config) (*NeuralNet, error) {
 	return &NeuralNet{
 		conf:    conf,
 		weights: weights,
-		memory:  make([]*migo.Matrix, conf.NumLayer+1),
 	}, nil
 }
 
@@ -75,11 +72,6 @@ func (n *NeuralNet) NumWeights() int {
 // Get the neural network's weights.
 func (n *NeuralNet) Weights() []*migo.Matrix {
 	return n.weights
-}
-
-// Get the neural network's current memory.
-func (n *NeuralNet) Memory() []*migo.Matrix {
-	return n.memory
 }
 
 // Build the neural network given a list of weights; return an
@@ -136,18 +128,14 @@ func (n *NeuralNet) Feedforward(inputs []float64) ([]float64, error) {
 	if len(inputs) != n.conf.NumInput {
 		return nil, ErrInputLen
 	}
-	for i, w := range n.weights {
+	for _, w := range n.weights {
 		inputs = append(inputs, n.conf.Bias)
 		im, _ := migo.New(1, len(inputs), inputs)
 		outputs, _ := im.Mult(w)
 		// apply activation function
-		fmt.Printf("OUTPUT NUM ROW: %d\n", outputs.NumRow())
-		fmt.Printf("OUTPUT NUM COL: %d\n", outputs.NumColumn())
-		fmt.Printf("OUTPUT DATA: %f\n", outputs.Data())
-		signal := outputs.Func(n.conf.Activation)
+		signals := outputs.Func(n.conf.Activation)
 		// store activation output
-		n.memory[i].Copy(signal)
-		inputs = outputs.Data()
+		inputs = signals.Data()
 	}
 	return inputs, nil
 }

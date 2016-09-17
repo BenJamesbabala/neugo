@@ -31,13 +31,6 @@ func TestNeuralNet(t *testing.T) {
 	}
 	fmt.Printf("outputs: %f\n", outputs)
 
-	// memory
-	fmt.Printf("memory:\n")
-	for i, m := range nn.memory {
-		fmt.Printf("Layer %d\n", i)
-		m.Print()
-	}
-
 	// power test
 	for i := 1; i < 100; i++ {
 		nn, err = NewNeuralNet(&Config{
